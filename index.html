@@ -1,8 +1,206 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>AI 어플</title>
-  </head>
-  <body>
-    아무거나 글자를 입력해보세요.
-  </body>
+<head>
+    <title>귀여운 Teachable Machine 친구</title>
+    <style>
+        /* 전체 페이지 스타일 */
+        body {
+            font-family: 'Arial', sans-serif; /* 깔끔한 폰트 */
+            background-color: #f0f8ff; /* 연한 하늘색 배경으로 포근한 느낌 */
+            display: flex;
+            justify-content: center; /* 가운데 정렬 */
+            align-items: center; /* 세로 가운데 정렬 */
+            min-height: 100vh; /* 화면 전체 높이 사용 */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+        }
+
+        /* 메인 컨테이너 스타일 */
+        .container {
+            background-color: #ffffff; /* 흰색 컨테이너로 깔끔하게 */
+            border-radius: 20px; /* 둥글둥글 귀여운 모서리 */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* 은은한 그림자로 입체감 */
+            padding: 30px;
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column; /* 세로로 쌓이도록 */
+            gap: 25px; /* 요소들 사이 간격 */
+        }
+
+        /* 제목 스타일 */
+        h1 {
+            color: #4682b4; /* 스틸 블루 색상으로 시원하게 */
+            margin-bottom: 25px;
+            font-size: 2.2em; /* 제목은 크게! */
+            font-weight: bold;
+        }
+
+        /* 시작 버튼 스타일 */
+        button {
+            background-color: #ffb6c1; /* 연한 분홍색 버튼으로 사랑스럽게 */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px; /* 동글동글 버튼 */
+            cursor: pointer; /* 마우스 올리면 손가락 모양 */
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* 부드러운 애니메이션 */
+            box-shadow: 0 4px 10px rgba(255, 182, 193, 0.5); /* 버튼에도 은은한 그림자 */
+            margin-bottom: 25px;
+        }
+
+        button:hover {
+            background-color: #ff69b4; /* 마우스 올리면 진한 분홍색으로 변신! */
+            transform: translateY(-2px); /* 살짝 떠오르는 효과 */
+        }
+
+        /* 웹캠과 라벨 영역을 담는 컨테이너 */
+        .content-area {
+            display: flex;
+            flex-wrap: wrap; /* 화면 작아지면 줄바꿈 */
+            justify-content: center; /* 가운데 정렬 */
+            gap: 30px; /* 웹캠과 라벨 사이 간격 */
+        }
+
+        /* 웹캠 컨테이너 스타일 */
+        #webcam-container {
+            border: 5px solid #add8e6; /* 연한 파란색 테두리로 깔끔하게 */
+            border-radius: 15px; /* 둥근 모서리 */
+            overflow: hidden; /* 내용이 넘치면 숨기기 */
+            width: 200px; /* 웹캠 크기 고정 */
+            height: 200px;
+            flex-shrink: 0; /* 크기가 줄어들지 않도록 */
+        }
+
+        #webcam-container canvas {
+            display: block; /* 캔버스 아래 생기는 미세한 여백 제거 */
+        }
+
+        /* 예측 라벨 컨테이너 스타일 */
+        #label-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* 라벨들 사이 간격 */
+            flex-grow: 1; /* 남은 공간을 채우도록 늘어나기 */
+            max-width: 300px; /* 예측 라벨 최대 너비 */
+            min-width: 200px;
+        }
+
+        /* 개별 예측 라벨 스타일 */
+        #label-container div {
+            background-color: #e0ffff; /* 연한 청록색 배경으로 시원하게 */
+            padding: 12px 15px;
+            border-radius: 10px; /* 둥근 모서리 */
+            font-size: 1.1em;
+            color: #36454f; /* 어두운 회색 글씨 */
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* 은은한 그림자 */
+            font-weight: 600; /* 살짝 두껍게 */
+            min-height: 40px; /* 내용이 없어도 높이 유지 */
+            display: flex; /* 텍스트 세로 중앙 정렬을 위해 */
+            align-items: center; /* 텍스트 세로 중앙 정렬 */
+            justify-content: center; /* 텍스트 가로 중앙 정렬 */
+        }
+
+        /* 모바일 반응형: 화면이 작아지면 세로로 정렬 */
+        @media (max-width: 768px) {
+            .content-area {
+                flex-direction: column; /* 세로로 쌓이도록 */
+                align-items: center; /* 가운데 정렬 */
+            }
+            #label-container {
+                max-width: 100%; /* 모바일에서는 너비 꽉 채우기 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ 귀요미 Teachable Machine 친구! ✨</h1>
+        <button type="button" onclick="init()">시작하기! 🚀</button>
+        <div class="content-area">
+            <div id="webcam-container"></div>
+            <div id="label-container"></div>
+        </div>
+    </div>
+
+    <!-- 기존 스크립트 그대로 유지 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script type="text/javascript">
+        // More API functions here:
+        // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+        // the link to your model provided by Teachable Machine export panel
+        const URL = "https://teachablemachine.withgoogle.com/models/ZZZRWKFSJ/";
+
+        let model, webcam, labelContainer, maxPredictions;
+
+        // Load the image model and setup the webcam
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+
+            // load the model and metadata
+            // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+            // or files from your local hard drive
+            // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+            model = await tmImage.load(modelURL, metadataURL);
+            maxPredictions = model.getTotalClasses();
+
+            // Convenience function to setup a webcam
+            const flip = true; // whether to flip the webcam
+            webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+            await webcam.setup(); // request access to the webcam
+            await webcam.play();
+            window.requestAnimationFrame(loop);
+
+            // append elements to the DOM
+            document.getElementById("webcam-container").appendChild(webcam.canvas);
+            labelContainer = document.getElementById("label-container");
+            // 예측 결과는 이제 하나의 div에만 표시할 예정이므로, div를 하나만 추가합니다.
+            labelContainer.appendChild(document.createElement("div"));
+        }
+
+        async function loop() {
+            webcam.update(); // update the webcam frame
+            await predict();
+            window.requestAnimationFrame(loop);
+        }
+
+        // run the webcam image through the image model
+        async function predict() {
+            // predict can take in an image, video or canvas html element
+            const prediction = await model.predict(webcam.canvas);
+
+            // 가장 확률이 높은 클래스를 찾아요!
+            let topPrediction = prediction[0];
+            for (let i = 1; i < prediction.length; i++) {
+                if (prediction[i].probability > topPrediction.probability) {
+                    topPrediction = prediction[i];
+                }
+            }
+
+            let message = "";
+            const probabilityPercent = (topPrediction.probability * 100).toFixed(0); // 소수점 없이 백분율!
+
+            // 'good'과 'bad'에 따라 다른 메시지를 보여줄게요!
+            if (topPrediction.className === 'good') {
+                message = `지금은 깨어있는 상태예요! (확률: ${probabilityPercent}%) 😊`;
+            } else if (topPrediction.className === 'bad') {
+                message = `지금 졸고 있는 것 같아요! (확률: ${probabilityPercent}%) 😴`;
+            } else {
+                // 혹시 다른 클래스가 있다면, 이렇게 보여줄게!
+                message = `음... 이건 ${topPrediction.className} 같네요! (확률: ${probabilityPercent}%) 🤔`;
+            }
+
+            // labelContainer의 첫 번째 div에 메시지를 업데이트해요.
+            labelContainer.childNodes[0].innerHTML = message;
+        }
+    </script>
+</body>
 </html>
